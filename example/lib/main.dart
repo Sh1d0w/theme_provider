@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 void main() => runApp(MyApp());
@@ -15,9 +14,7 @@ class MyApp extends StatelessWidget {
         if (savedTheme != null) {
           controller.setTheme(savedTheme);
         } else {
-          Brightness platformBrightness =
-              SchedulerBinding.instance?.window.platformBrightness ??
-                  Brightness.light;
+          Brightness platformBrightness = View.of(context).platformDispatcher.platformBrightness;
           if (platformBrightness == Brightness.dark) {
             controller.setTheme('dark');
           } else {
@@ -51,14 +48,13 @@ class HomePage extends StatelessWidget {
       id: customAppThemeId,
       description: "Custom Color Scheme",
       data: ThemeData(
-        accentColor: Colors.yellow,
         primaryColor: Colors.red,
         scaffoldBackgroundColor: Colors.yellow[200],
-        buttonColor: Colors.amber,
         dialogBackgroundColor: Colors.yellow,
         elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(primary: Colors.red),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
         ),
+        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.yellow),
       ),
     );
   }
@@ -86,8 +82,7 @@ class HomePage extends StatelessWidget {
             _buildButton(
               text: "Second Screen",
               onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => SecondPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (_) => SecondPage()));
               },
             ),
             Divider(),
@@ -106,9 +101,7 @@ class HomePage extends StatelessWidget {
                   : null,
             ),
             Divider(),
-            controller.hasTheme(customAppThemeId)
-                ? Text('Custom theme added')
-                : Container(),
+            controller.hasTheme(customAppThemeId) ? Text('Custom theme added') : Container(),
             Text('Current theme: ${controller.theme.id}'),
           ],
         ),

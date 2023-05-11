@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:theme_provider/src/controller/theme_controller.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 class AppThemeOptionsTester implements AppThemeOptions {
@@ -25,19 +23,12 @@ void main() {
     expect(() => buildWidgetTree([AppTheme.light()]), throwsAssertionError);
     expect(buildWidgetTree([AppTheme.light(), AppTheme.light()]), isNotNull);
 
-    expect(() => buildWidgetTree([AppTheme.light(), AppTheme.light(id: "")]),
+    expect(() => buildWidgetTree([AppTheme.light(), AppTheme.light(id: "")]), throwsAssertionError);
+    expect(() => buildWidgetTree([AppTheme.light(), AppTheme.light(id: "no spaces")]),
         throwsAssertionError);
-    expect(
-        () => buildWidgetTree(
-            [AppTheme.light(), AppTheme.light(id: "no spaces")]),
+    expect(() => buildWidgetTree([AppTheme.light(), AppTheme.light(id: "No_Upper")]),
         throwsAssertionError);
-    expect(
-        () =>
-            buildWidgetTree([AppTheme.light(), AppTheme.light(id: "No_Upper")]),
-        throwsAssertionError);
-    expect(
-        () => buildWidgetTree([AppTheme.light(), AppTheme.light(id: "ok_id")]),
-        isNotNull);
+    expect(() => buildWidgetTree([AppTheme.light(), AppTheme.light(id: "ok_id")]), isNotNull);
   });
 
   testWidgets('ThemeProvider ancestor test', (tester) async {
@@ -75,8 +66,7 @@ void main() {
                   key: buttonKey,
                   child: Text("Press Me"),
                   onPressed: () {
-                    ThemeController controller =
-                        ThemeProvider.controllerOf(context);
+                    ThemeController controller = ThemeProvider.controllerOf(context);
                     controller.nextTheme();
                   },
                 ),
@@ -89,14 +79,12 @@ void main() {
 
     await tester.pump();
 
-    expect(Theme.of(tester.element(find.byKey(buttonKey))).brightness,
-        equals(Brightness.light));
+    expect(Theme.of(tester.element(find.byKey(buttonKey))).brightness, equals(Brightness.light));
 
     await tester.tap(find.byKey(buttonKey));
     await tester.pumpAndSettle();
 
-    expect(Theme.of(tester.element(find.byKey(buttonKey))).brightness,
-        equals(Brightness.dark));
+    expect(Theme.of(tester.element(find.byKey(buttonKey))).brightness, equals(Brightness.dark));
   });
 
   testWidgets('Basic Theme Change test', (tester) async {
@@ -125,13 +113,11 @@ void main() {
     await tester.pump();
 
     expect(
-        ThemeProvider.optionsOf<AppThemeOptionsTester>(
-                tester.element(find.byKey(scaffoldKey)))
+        ThemeProvider.optionsOf<AppThemeOptionsTester>(tester.element(find.byKey(scaffoldKey)))
             .color,
         isNot(Colors.red));
     expect(
-        ThemeProvider.optionsOf<AppThemeOptionsTester>(
-                tester.element(find.byKey(scaffoldKey)))
+        ThemeProvider.optionsOf<AppThemeOptionsTester>(tester.element(find.byKey(scaffoldKey)))
             .color,
         equals(Colors.blue));
   });
@@ -151,8 +137,8 @@ void main() {
 
     await tester.pump();
 
-    expect(ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey))).id,
-        startsWith("default_"));
+    expect(
+        ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey))).id, startsWith("default_"));
   });
 
   testWidgets('Duplicate Theme Id Test', (tester) async {
@@ -181,10 +167,8 @@ void main() {
   testWidgets('Select by Theme Id Test', (tester) async {
     final Key scaffoldKey = UniqueKey();
 
-    var fetchCommand = () =>
-        ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
-    var fetchTheme =
-        () => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
+    var fetchCommand = () => ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
+    var fetchTheme = () => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
 
     await tester.pumpWidget(
       ThemeProvider(
@@ -212,27 +196,25 @@ void main() {
   testWidgets('Set default theme id test', (tester) async {
     final Key scaffoldKey = UniqueKey();
 
-    var getCurrentThemeId =
-        () => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey))).id;
+    var getCurrentThemeId = () => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey))).id;
 
-    var widgetTreeWithDefaultTheme =
-        ({String? defaultTheme}) async => await tester.pumpWidget(
-              ThemeProvider(
-                child: MaterialApp(
-                  home: ThemeConsumer(
-                    child: Scaffold(key: scaffoldKey),
-                  ),
-                ),
-                defaultThemeId: defaultTheme,
-                themes: [
-                  AppTheme.light(),
-                  AppTheme.light(id: "test_theme_1"),
-                  AppTheme.light(id: "test_theme_2"),
-                  AppTheme.light(id: "test_theme_3"),
-                  AppTheme.light(id: "test_theme_4"),
-                ],
+    var widgetTreeWithDefaultTheme = ({String? defaultTheme}) async => await tester.pumpWidget(
+          ThemeProvider(
+            child: MaterialApp(
+              home: ThemeConsumer(
+                child: Scaffold(key: scaffoldKey),
               ),
-            );
+            ),
+            defaultThemeId: defaultTheme,
+            themes: [
+              AppTheme.light(),
+              AppTheme.light(id: "test_theme_1"),
+              AppTheme.light(id: "test_theme_2"),
+              AppTheme.light(id: "test_theme_3"),
+              AppTheme.light(id: "test_theme_4"),
+            ],
+          ),
+        );
 
     await widgetTreeWithDefaultTheme();
     expect(getCurrentThemeId(), equals("default_light_theme"));
@@ -272,10 +254,10 @@ void main() {
       );
     };
 
-    var getCurrentTheme = (Key scaffoldKey) =>
-        ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
-    var getCurrentController = (Key scaffoldKey) =>
-        ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
+    var getCurrentTheme =
+        (Key scaffoldKey) => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
+    var getCurrentController =
+        (Key scaffoldKey) => ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
 
     Key scaffoldKey1 = UniqueKey();
     await buildWidgetTree(scaffoldKey1);
@@ -322,10 +304,10 @@ void main() {
       );
     };
 
-    var getCurrentTheme = (Key scaffoldKey) =>
-        ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
-    var getCurrentController = (Key scaffoldKey) =>
-        ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
+    var getCurrentTheme =
+        (Key scaffoldKey) => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
+    var getCurrentController =
+        (Key scaffoldKey) => ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
 
     Key scaffoldKey1 = UniqueKey();
     await buildWidgetTree(scaffoldKey1);
@@ -367,10 +349,10 @@ void main() {
       );
     };
 
-    var getCurrentTheme = (Key scaffoldKey) =>
-        ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
-    var getCurrentController = (Key scaffoldKey) =>
-        ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
+    var getCurrentTheme =
+        (Key scaffoldKey) => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
+    var getCurrentController =
+        (Key scaffoldKey) => ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
 
     Key scaffoldKey1 = UniqueKey();
     await buildWidgetTree(scaffoldKey1);
@@ -410,10 +392,10 @@ void main() {
       );
     };
 
-    var getCurrentTheme = (Key scaffoldKey) =>
-        ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
-    var getCurrentController = (Key scaffoldKey) =>
-        ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
+    var getCurrentTheme =
+        (Key scaffoldKey) => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
+    var getCurrentController =
+        (Key scaffoldKey) => ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
 
     Key scaffoldKey1 = UniqueKey();
     await buildWidgetTree(scaffoldKey1);
@@ -453,10 +435,10 @@ void main() {
       );
     };
 
-    var getCurrentTheme = (Key scaffoldKey) =>
-        ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
-    var getCurrentController = (Key scaffoldKey) =>
-        ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
+    var getCurrentTheme =
+        (Key scaffoldKey) => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
+    var getCurrentController =
+        (Key scaffoldKey) => ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
 
     Key scaffoldKey1 = UniqueKey();
     String firstId = "A";
@@ -485,14 +467,11 @@ void main() {
     expect(getCurrentTheme(scaffoldKey4).id, "fourth_test_theme_2");
   });
 
-  testWidgets('Dynamically theme adding/removing/membership checking',
-      (tester) async {
+  testWidgets('Dynamically theme adding/removing/membership checking', (tester) async {
     final Key scaffoldKey = UniqueKey();
 
-    var fetchCommand = () =>
-        ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
-    var fetchTheme =
-        () => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
+    var fetchCommand = () => ThemeProvider.controllerOf(tester.element(find.byKey(scaffoldKey)));
+    var fetchTheme = () => ThemeProvider.themeOf(tester.element(find.byKey(scaffoldKey)));
 
     final AppTheme customTheme = AppTheme.light(id: 'custom');
 

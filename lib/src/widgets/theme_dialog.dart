@@ -70,8 +70,7 @@ class ThemeDialog extends StatelessWidget {
       title: title,
       children: ThemeProvider.controllerOf(context)
           .allThemes
-          .map<Widget>(
-              (theme) => _buildThemeTile(context, theme, currentThemeId))
+          .map<Widget>((theme) => _buildThemeTile(context, theme, currentThemeId))
           .toList(),
     );
   }
@@ -101,10 +100,9 @@ class ThemeDialog extends StatelessWidget {
           CircleAvatar(
             backgroundColor: outerCircleColorBuilder != null
                 ? outerCircleColorBuilder!(theme)
-                : theme.data.accentColor,
+                : theme.data.colorScheme.secondary,
             child: CircleAvatar(
-              backgroundColor: innerCircleColorBuilder?.call(theme) ??
-                  theme.data.primaryColor,
+              backgroundColor: innerCircleColorBuilder?.call(theme) ?? theme.data.primaryColor,
               radius: innerCircleRadius,
             ),
           ),
